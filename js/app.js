@@ -31,6 +31,13 @@ const btnSaveOffline = document.getElementById('btn-save-offline');
 fileInput.addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
+  fileInput.value = '';
+
+  if (!/\.(gift|txt)$/i.test(file.name)) {
+    showError('Wrong file type — please select a .gift or .txt file.');
+    return;
+  }
+
   currentFileName = file.name;
   fileNameEl.textContent = file.name;
   localStorage.setItem(FILENAME_KEY, file.name);
@@ -40,7 +47,6 @@ fileInput.addEventListener('change', e => {
     loadGift(rawGiftText);
   };
   reader.readAsText(file, 'UTF-8');
-  fileInput.value = '';
 });
 
 function loadGift(text) {
