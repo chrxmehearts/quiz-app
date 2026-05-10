@@ -25,11 +25,11 @@ async function saveEmbedded() {
       combinedJs = parts.join('\n\n');
     }
 
-    // Escape </script> sequences so they don't break the inline script block in the output HTML.
-    // JavaScript evaluates <\/script> as </script> at runtime, so behavior is preserved.
-    const safeJs = combinedJs.replace(/<\/script>/gi, '<\\/script>');
+    // Escape closing script tags so they don't break the bundled inline script block.
+    // Match with or without the closing > — the HTML parser triggers on the opening sequence.
+    const safeJs = combinedJs.replace(/<\/script/gi, '<\\/script');
 
-    // Encode GIFT data: escape < so </script> inside questions can't break the data script tag
+    // Encode GIFT data: escape < to prevent tag sequences in questions from breaking the output
     const safeJson = JSON.stringify(rawGiftText).replace(/</g, '\\u003c');
 
     const cssEl    = document.querySelector('link[rel="stylesheet"]');
@@ -51,8 +51,7 @@ async function saveEmbedded() {
     if (fnEl) fnEl.textContent = 'Embedded quiz';
 
     // Build the self-contained HTML.
-    // String split trick: avoid the literal sequence </script inside this source file,
-    // because this file itself ends up inside an inline <script> block after bundling.
+    // Use string concatenation for tag sequences to keep this source safe when bundled.
     const CS = '<' + '/';
     const html = [
       '<!DOCTYPE html>',
