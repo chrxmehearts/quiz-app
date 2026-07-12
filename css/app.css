@@ -170,6 +170,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .option-key { font-family: var(--font-mono); font-weight: 700; color: var(--text-muted); min-width: 20px; font-size: .78rem; padding-top: 1px; }
 .option-key::before { content: '['; }
 .option-key::after { content: ']'; }
+.option-text { white-space: pre-wrap; }
+.option-code .option-text { font-family: var(--font-mono); font-size: .82rem; line-height: 1.6; }
 
 .option-btn.correct { border-color: var(--correct-border); border-left-color: var(--correct); background: var(--correct-bg); color: var(--correct); }
 .option-btn.wrong { border-color: var(--wrong-border); border-left-color: var(--wrong); background: var(--wrong-bg); color: var(--wrong); }

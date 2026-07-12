@@ -97,21 +97,29 @@ function parseAnswers(block) {
   const answers = [];
   let isMulti = false;
 
+  // A line that doesn't start a new answer (=/~) is a continuation of the
+  // previous one — this is what lets an answer's text span multiple lines,
+  // e.g. a multi-line Apex code snippet.
   const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+  let current = null;
 
   for (const line of lines) {
     if (line.startsWith('=')) {
-      answers.push({ text: line.slice(1).trim(), correct: true, weight: 100 });
+      current = { text: line.slice(1).trim(), correct: true, weight: 100 };
+      answers.push(current);
     } else if (line.startsWith('~')) {
       const inner = line.slice(1).trim();
       const weightMatch = inner.match(/^%([-\d.]+)%(.+)$/s);
       if (weightMatch) {
         isMulti = true;
         const weight = parseFloat(weightMatch[1]);
-        answers.push({ text: weightMatch[2].trim(), correct: weight > 0, weight });
+        current = { text: weightMatch[2].trim(), correct: weight > 0, weight };
       } else {
-        answers.push({ text: inner, correct: false, weight: 0 });
+        current = { text: inner, correct: false, weight: 0 };
       }
+      answers.push(current);
+    } else if (current) {
+      current.text += '\n' + line;
     }
   }
 

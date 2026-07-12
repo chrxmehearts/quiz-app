@@ -95,10 +95,11 @@ function buildCard(q, idx) {
   q.answers.forEach((ans, i) => {
     const li  = document.createElement('li');
     const btn = document.createElement('button');
-    btn.className = 'option-btn';
+    const isCode = ans.text.includes('\n');
+    btn.className = 'option-btn' + (isCode ? ' option-code' : '');
     btn.disabled  = q.answered;
     btn.dataset.index = i;
-    btn.innerHTML = `<span class="option-key">${keys[i] || i + 1}</span><span>${escHtml(ans.text)}</span>`;
+    btn.innerHTML = `<span class="option-key">${keys[i] || i + 1}</span><span class="option-text">${escHtml(ans.text)}</span>`;
 
     if (q.answered) {
       applyAnsweredStyle(btn, q, i);
