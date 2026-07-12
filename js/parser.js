@@ -3,7 +3,7 @@
 function parseGiftFile(text) {
   const questions = [];
   const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-  const rawBlocks = normalized.split(/\n{2,}/);
+  const rawBlocks = splitIntoQuestionBlocks(normalized);
 
   for (const block of rawBlocks) {
     const trimmed = block.trim();
@@ -64,6 +64,33 @@ function parseGiftFile(text) {
   }
 
   return questions;
+}
+
+// Splits on `::title::` markers rather than blank lines, since a question's
+// body can itself contain blank lines (e.g. a scenario paragraph followed by
+// the actual prompt) or embedded code blocks with their own braces.
+function splitIntoQuestionBlocks(normalized) {
+  const lines = normalized.split('\n');
+  const blocks = [];
+  let current = [];
+
+  for (const line of lines) {
+    if (/^::[^:]+::/.test(line.trim())) {
+      let commentStart = current.length;
+      while (commentStart > 0 && current[commentStart - 1].trim().startsWith('//')) {
+        commentStart--;
+      }
+      const leadingComments = current.slice(commentStart);
+      const prevBlock = current.slice(0, commentStart);
+      if (prevBlock.some(l => l.trim())) blocks.push(prevBlock.join('\n'));
+      current = leadingComments.concat([line]);
+    } else {
+      current.push(line);
+    }
+  }
+  if (current.some(l => l.trim())) blocks.push(current.join('\n'));
+
+  return blocks;
 }
 
 function parseAnswers(block) {
