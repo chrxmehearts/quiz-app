@@ -1,7 +1,8 @@
 'use strict';
 
-const STORAGE_KEY  = 'quiz_answers_v1';
-const FILENAME_KEY = 'quiz_last_file';
+const STORAGE_KEY   = 'quiz_answers_v1';
+const FILENAME_KEY  = 'quiz_last_file';
+const GIFT_TEXT_KEY = 'quiz_last_gift_v1';
 
 function loadStoredAnswers() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
@@ -31,4 +32,18 @@ function applyStoredAnswers(questions) {
 
 function clearStorage() {
   localStorage.removeItem(STORAGE_KEY);
+}
+
+// Persist the raw GIFT text so the last file auto-restores on next visit.
+// Quota overflow (or Safari private mode) just skips persistence.
+function persistGift(fileName, text) {
+  try {
+    localStorage.setItem(FILENAME_KEY, fileName);
+    localStorage.setItem(GIFT_TEXT_KEY, text);
+  } catch { /* storage unavailable — session still works */ }
+}
+
+function loadSavedGiftText() {
+  try { return localStorage.getItem(GIFT_TEXT_KEY); }
+  catch { return null; }
 }

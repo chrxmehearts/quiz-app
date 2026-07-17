@@ -92,23 +92,30 @@ function buildCard(q, idx) {
   optList.className = 'options-list';
   const keys = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-  q.answers.forEach((ans, i) => {
+  // Options render in the question's shuffled displayOrder; dataset.index and
+  // selectedIndices always refer to the original answer index.
+  const order = q.displayOrder && q.displayOrder.length === q.answers.length
+    ? q.displayOrder
+    : q.answers.map((_, i) => i);
+
+  order.forEach((ansIdx, pos) => {
+    const ans = q.answers[ansIdx];
     const li  = document.createElement('li');
     const btn = document.createElement('button');
     const isCode = ans.text.includes('\n');
     btn.className = 'option-btn' + (isCode ? ' option-code' : '');
     btn.disabled  = q.answered;
-    btn.dataset.index = i;
-    btn.innerHTML = `<span class="option-key">${keys[i] || i + 1}</span><span class="option-text">${escHtml(ans.text)}</span>`;
+    btn.dataset.index = ansIdx;
+    btn.innerHTML = `<span class="option-key">${keys[pos] || pos + 1}</span><span class="option-text">${escHtml(ans.text)}</span>`;
 
     if (q.answered) {
-      applyAnsweredStyle(btn, q, i);
-    } else if (q.isMulti && q.selectedIndices.includes(i)) {
+      applyAnsweredStyle(btn, q, ansIdx);
+    } else if (q.isMulti && q.selectedIndices.includes(ansIdx)) {
       btn.classList.add('selected-neutral');
     }
 
     if (!q.answered) {
-      onTap(btn, () => handleOptionClick(q, i, card));
+      onTap(btn, () => handleOptionClick(q, ansIdx, card));
     }
 
     li.appendChild(btn);

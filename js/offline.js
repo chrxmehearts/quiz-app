@@ -4,8 +4,8 @@ async function saveEmbedded() {
   if (!rawGiftText) return;
 
   const btn = document.getElementById('btn-save-offline');
-  btn.disabled    = true;
-  btn.textContent = 'Generating...';
+  btn.disabled = true;
+  btn.classList.add('busy');
 
   try {
     let combinedJs;
@@ -87,7 +87,7 @@ async function saveEmbedded() {
       'Tip: use Chrome or Edge — Firefox blocks reading local files via fetch().'
     );
   } finally {
-    btn.disabled  = false;
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Save for offline';
+    btn.disabled = false;
+    btn.classList.remove('busy');
   }
 }

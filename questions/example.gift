@@ -1,102 +1,94 @@
-// EXPLANATION: Visualforce handles Classic overrides; Lightning components handle LE overrides.
-::Q1 | UI::
-A developer must override the Contact Edit button in both Salesforce Classic and Lightning Experience. What should the developer use? {
-  =A Visualforce page in Classic and a Lightning component in LE
-  ~A Lightning page in Classic and a Visualforce page in LE
-  ~A Lightning component in Classic and a Lightning component in LE
-  ~A Visualforce page in Classic and a Visualforce page in LE
+// GIFT quick reference — everything this app's parser understands:
+//   ::Title | Topic::    title + topic tab (omit "| Topic" to file under General)
+//   =answer              correct option
+//   ~answer              wrong option
+//   ~%50%answer          multi-select option with a positive/negative weight
+//   // EXPLANATION: ...  optional, shown after answering; place it right above the question
+// Question bodies may span several paragraphs and contain code blocks.
+// Answers may span several lines too (e.g. code snippets).
+
+// EXPLANATION: 201 Created is the conventional response for a successful POST that created a new resource. 200 is a generic success, 204 has no body, 302 is a redirect.
+::Q1 | HTTP::
+Which status code should a REST API return when a POST request successfully creates a new resource? {
+  =201 Created
+  ~200 OK
+  ~204 No Content
+  ~302 Found
 }
 
-// EXPLANATION: Declarative tools are Record-Triggered Flow and Validation Rules.
-::Q2 | Automation::
-Universal Containers decides to use purely declarative development. Which two options build the business logic layer? {
-  ~%50%Record-Triggered Flow
-  ~%-50%Remote Actions
-  ~%50%Validation Rules
-  ~%-50%Batch Jobs
+// EXPLANATION: Both const and let are block-scoped. var is function-scoped and hoisted; window is a global object, not a declaration keyword.
+::Q2 | JavaScript::
+Which two declarations are block-scoped? {
+  ~%50%const
+  ~%50%let
+  ~%-50%var
+  ~%-50%window
 }
 
-// EXPLANATION: with sharing enforces org sharing rules at the SOQL/DML level.
-::Q3 | Security::
-A custom Account search tool uses a private sharing model. Users report they can see Accounts they do not own. What should the developer use to enforce sharing? {
-  ~Use the Account.sharing keyword on the class declaration
-  ~Use schema describe calls to determine access
-  ~Use the UserInfo Apex class to filter SOQL queries
-  =Use the with sharing keyword on the class declaration
+// EXPLANATION: All three callbacks close over the same var i, which is already 3 when they run. let creates a fresh binding per iteration, so each callback captures its own value.
+::Q3 | JavaScript::
+A developer expects this snippet to log 0, 1, 2 — but it logs 3, 3, 3.
+
+for (var i = 0; i < 3; i++) {
+    setTimeout(function () {
+        console.log(i);
+    }, 10);
 }
 
-// EXPLANATION: @future methods run asynchronously and cannot return values or accept sObject parameters.
-::Q4 | Apex::
-A developer needs to make a callout from a trigger. What is the correct approach? {
-  =Call a method annotated with @future(callout=true)
-  ~Make the callout directly inside the trigger
-  ~Use a synchronous Apex method
-  ~Use a platform event to trigger a flow
+What is the smallest change that fixes it? {
+  =Replace var with let in the for statement
+  ~Move console.log(i) outside the setTimeout callback
+  ~Decrease the setTimeout delay to 0
+  ~Wrap the loop in 'use strict'
 }
 
-// EXPLANATION: SOQL injection occurs when user input is concatenated directly into a SOQL string.
-::Q5 | Security::
-A developer is building a search feature. Which coding practice prevents SOQL injection? {
-  ~Concatenating user input directly into query strings
-  =Using bind variables in SOQL queries
-  ~Encoding query strings with EncodingUtil
-  ~Limiting queries to 100 records
+// EXPLANATION: ORDER BY salary DESC sorts highest first and LIMIT 3 keeps the top three rows. ASC would return the lowest-paid; the other two are not valid SQL.
+::Q4 | SQL::
+Which query returns the three highest-paid employees? {
+  =SELECT name, salary
+  FROM employees
+  ORDER BY salary DESC
+  LIMIT 3;
+  ~SELECT name, salary
+  FROM employees
+  ORDER BY salary ASC
+  LIMIT 3;
+  ~SELECT TOP name, salary
+  IN employees
+  BY salary DESC 3;
+  ~SELECT name, MAX(salary, 3)
+  FROM employees;
 }
 
-// EXPLANATION: Governor limits apply per transaction; Apex has a 100 SOQL query limit per synchronous transaction.
-::Q6 | Apex::
-Which two statements are true about Salesforce governor limits? {
-  ~%50%They apply per Apex transaction
-  ~%-50%They reset after each DML statement
-  ~%50%Asynchronous Apex has higher limits than synchronous
-  ~%-50%They only apply in production orgs
+// EXPLANATION: Binary floating point cannot represent 0.1 or 0.2 exactly, so the sum is 0.30000000000000004. Compare with a small tolerance (epsilon) instead of strict equality.
+::Q5::
+A junior developer is confused by this REPL session:
+
+> 0.1 + 0.2 === 0.3
+false
+
+They ask why the comparison fails.
+
+What is the correct explanation? {
+  =Binary floating point cannot represent 0.1 or 0.2 exactly, so the sum carries a tiny rounding error
+  ~The === operator also compares types, and 0.3 is parsed as a string here
+  ~JavaScript rounds all decimals to 15 significant digits before comparing
+  ~The REPL evaluates the right-hand side first, which changes the result
 }
 
-// EXPLANATION: A master-detail relationship rolls up and cascade-deletes; lookup is a loose reference.
-::Q7 | Data Model::
-What happens to detail records when a master record is deleted in a master-detail relationship? {
-  =They are automatically deleted (cascade delete)
-  ~They become orphaned with a null lookup field
-  ~Deletion of the master is prevented
-  ~They are archived but not deleted
+::Q6 | Git::
+Which command shows the commit history of the current branch? {
+  =git log
+  ~git status
+  ~git diff
+  ~git show-branch --all
 }
 
-// EXPLANATION: Platform Events use publish/subscribe model and can be used to trigger flows or Apex.
-::Q8 | Automation::
-A developer needs to decouple two systems so that one system can notify another without tight integration. Which Salesforce feature is most appropriate? {
-  =Platform Events
-  ~Workflow Rules
-  ~Process Builder
-  ~Batch Apex
-}
-
-// EXPLANATION: A trigger with no recursion guard re-fires on every DML inside itself, so an update in the trigger body causes the trigger to run again for the same records.
-::Q9 | Apex::
-A developer writes the following before-update trigger on Account, intended to append a suffix to the Name field exactly once.
-
-trigger AccountTrigger on Account (before update) {
-    for (Account acc : Trigger.new) {
-        acc.Name = acc.Name + ' - Reviewed';
-        update acc;
-    }
-}
-
-What is wrong with this trigger, and what is the correct fix? {
-  =Calling update inside a before-update trigger re-fires the trigger recursively and also throws, since before-triggers should mutate Trigger.new directly instead of issuing DML
-  ~Nothing is wrong; the trigger works as intended
-  ~The for loop should use Trigger.old instead of Trigger.new
-  ~The suffix should be appended in an after-update trigger instead
-}
-
-// EXPLANATION: SOAP callouts require the WSDL2Apex-generated class and cannot be made directly from a trigger context; queueable/future is needed to defer the callout outside the trigger's synchronous DML context.
-::Q10 | Integration::
-Universal Containers wants to notify an external SOAP-based inventory system whenever a Product2 record's stock quantity changes.
-
-The integration must not block the user's save operation, and must still run reliably if the external system is briefly unavailable.
-
-Which two approaches satisfy this requirement? {
-  ~%50%Make the callout from a Queueable Apex class enqueued from the trigger
-  ~%-50%Make the callout directly inside the trigger's before-update context
-  ~%50%Make the callout from a @future(callout=true) method invoked from the trigger
-  ~%-50%Make the callout synchronously from a Visualforce page controller's constructor
+// EXPLANATION: HTML structures content, CSS styles it, JavaScript adds behavior. HTTP is a transfer protocol, not a building block of the page itself.
+::Q7 | Web Basics::
+Which three technologies form the core building blocks of a front-end web page? {
+  ~%33.333%HTML
+  ~%33.333%CSS
+  ~%33.333%JavaScript
+  ~%-100%HTTP
 }

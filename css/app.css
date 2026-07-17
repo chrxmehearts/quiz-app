@@ -38,8 +38,10 @@
   --font-mono: 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
+/* Dark palette applies via system preference (unless the user forced light)
+   or via an explicit choice from the theme toggle ([data-theme="dark"]). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #17161b;
     --surface: #1f1e24;
     --surface2: #27252d;
@@ -60,6 +62,28 @@
     --wrong-border: #6b4038;
     --card-shadow: 0 1px 2px rgba(0, 0, 0, .35);
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #17161b;
+  --surface: #1f1e24;
+  --surface2: #27252d;
+  --surface3: #201f26;
+  --border: #37353f;
+  --border-strong: #4c4a55;
+  --text: #e9e6df;
+  --text-muted: #9a96a1;
+  --accent: #3fb0a6;
+  --accent-hover: #57c2b8;
+  --accent-ink: #072320;
+  --accent-soft: #16302d;
+  --correct: #6fbe83;
+  --correct-bg: #1c2a1f;
+  --correct-border: #3e6b49;
+  --wrong: #e5695c;
+  --wrong-bg: #2e1a18;
+  --wrong-border: #6b4038;
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, .35);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -89,11 +113,25 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 #file-label svg { width: 14px; height: 14px; flex-shrink: 0; }
 #file-input { display: none; }
 
-#btn-save-offline { display: none; align-items: center; gap: 7px; background: transparent; color: var(--correct); padding: 6px 13px; border-radius: var(--radius-sharp); cursor: pointer; font-size: .8rem; font-weight: 700; border: 1.5px solid var(--correct-border); font-family: var(--font-mono); transition: background .15s, color .15s; }
-#btn-save-offline svg { width: 14px; height: 14px; flex-shrink: 0; }
-#btn-save-offline:hover { background: var(--correct-bg); }
+/* ── Icon buttons (save offline, theme toggle) ── */
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 31px; height: 31px; background: transparent; color: var(--text-muted); border: 1px solid var(--border); border-radius: var(--radius-sharp); cursor: pointer; flex-shrink: 0; transition: background .15s, color .15s, border-color .15s; }
+.icon-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+.icon-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--border-strong); }
+.icon-btn:disabled { opacity: .6; cursor: default; }
+
+#btn-save-offline { display: none; }
 #btn-save-offline.visible { display: inline-flex; }
-#btn-save-offline:disabled { opacity: .6; cursor: default; }
+#btn-save-offline.busy svg { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.theme-icon-sun { display: none; }
+.theme-icon-moon { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-sun { display: block; }
+  :root:not([data-theme="light"]) .theme-icon-moon { display: none; }
+}
+:root[data-theme="dark"] .theme-icon-sun { display: block; }
+:root[data-theme="dark"] .theme-icon-moon { display: none; }
 
 #file-name { font-family: var(--font-mono); font-size: .74rem; color: var(--text-muted); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -103,14 +141,20 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .stat span { font-weight: 700; color: var(--text); }
 #stat-score { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
 #stat-score span { color: var(--accent-ink); }
+#stat-score.pass { background: var(--correct-bg); color: var(--correct); }
+#stat-score.pass span { color: var(--correct); }
+#stat-score.fail { background: var(--wrong-bg); color: var(--wrong); }
+#stat-score.fail span { color: var(--wrong); }
 
-/* ── Progress bar ── */
-#progress-wrap { height: 5px; background: var(--progress-bg); }
-#progress-fill {
-  height: 5px; width: 0%; background: var(--progress-fill);
+/* ── Progress bar: correct/wrong segments ── */
+#progress-wrap { height: 5px; background: var(--progress-bg); position: relative; }
+.progress-seg {
+  position: absolute; top: 0; height: 100%; width: 0%;
   background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,.16) 0 6px, transparent 6px 12px);
-  transition: width .3s ease;
+  transition: width .3s ease, left .3s ease;
 }
+#progress-correct { left: 0; background-color: var(--correct); }
+#progress-wrong { background-color: var(--wrong); }
 
 /* ── Controls ── */
 #controls { padding: 10px 20px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: var(--surface); border-bottom: 1px solid var(--border); }
@@ -119,6 +163,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .btn:hover { border-color: var(--border-strong); background: var(--surface3); }
 .btn.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
 .btn.active::before { color: var(--accent); }
+.btn.armed { background: var(--wrong-bg); color: var(--wrong); border-color: var(--wrong); }
+.btn.armed::before { color: var(--wrong); }
 
 /* ── Topic tabs ── */
 #topic-tabs { padding: 10px 20px; display: flex; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid var(--border); background: var(--surface); }
@@ -204,6 +250,21 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .explanation strong::before { content: '// '; color: var(--text-muted); }
 
 @keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Drag & drop overlay ── */
+#drop-overlay {
+  position: fixed; inset: 0; z-index: 2000; display: none;
+  align-items: center; justify-content: center;
+  background: rgba(23, 22, 27, .55); backdrop-filter: blur(2px);
+}
+#drop-overlay.visible { display: flex; }
+#drop-overlay .drop-box {
+  font-family: var(--font-mono); font-size: 1rem; font-weight: 700;
+  color: var(--accent); background: var(--surface);
+  border: 2px dashed var(--accent); border-radius: var(--radius-soft);
+  padding: 28px 44px; pointer-events: none;
+}
+#drop-overlay .drop-box::before { content: '\2913  '; }
 
 /* ── Responsive ── */
 @media (max-width: 600px) {

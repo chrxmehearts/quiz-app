@@ -15,7 +15,11 @@
   <label id="file-label" for="file-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Open .gift file</label>
   <input type="file" id="file-input">
   <span id="file-name">No file loaded</span>
-  <button id="btn-save-offline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Save for offline</button>
+  <button id="btn-save-offline" class="icon-btn" title="Save as offline HTML" aria-label="Save as offline HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></button>
+  <button id="btn-theme" class="icon-btn" title="Toggle theme" aria-label="Toggle light/dark theme">
+    <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
 </div>
 
 <div id="stats-bar">
@@ -26,7 +30,10 @@
   <div class="stat">Total: <span id="stat-total">0</span></div>
 </div>
 
-<div id="progress-wrap"><div id="progress-fill"></div></div>
+<div id="progress-wrap">
+  <div id="progress-correct" class="progress-seg"></div>
+  <div id="progress-wrong" class="progress-seg"></div>
+</div>
 
 <div id="controls">
   <button class="btn" id="btn-wrong">Show Wrong Only</button>
@@ -42,7 +49,7 @@
   <div id="quiz-container"></div>
   <div id="empty-state">
     <h2>Open a GIFT file to begin</h2>
-    <p>Click "Open .gift file" above and select a <code>.gift</code> or <code>.txt</code> file.</p>
+    <p>Click "Open .gift file" above — or drag &amp; drop a <code>.gift</code> / <code>.txt</code> file anywhere on this page.</p>
     <pre>::Q1 | Topic::
 Question text? {
   =Correct answer
@@ -54,6 +61,9 @@ Question text? {
   </div>
 </div>
 
+<div id="drop-overlay"><div class="drop-box">Drop .gift file to load</div></div>
+
+<script src="js/theme.js"></script>
 <script src="js/parser.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/stats.js"></script>
